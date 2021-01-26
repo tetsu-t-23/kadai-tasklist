@@ -13,13 +13,14 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //getでtasks/にアクセスされた場合の「一覧表示処理」
     public function index()
     {
         //メッセージ一覧を取得
         $tasks = Task::all();
         
         //メッセージ一覧ビューでそれを表示
-        return view('Task.index',['tasks' => $tasks,]);
+        return view('tasks.index',['tasks' => $tasks,]);
     }
 
     /**
@@ -27,11 +28,12 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+     //gerでtasks/createにアクセスされた場合の「新規登録画面表示処理」
+     public function create()
     {
-        $tasks = new Task;
+        $task = new Task;
         //メッセージ作成ビューを表示
-        return view('Task.create',['tasks' => $tasks,]);
+        return view('tasks.create',['task' => $task,]);
     }
 
     /**
@@ -40,12 +42,20 @@ class TasksController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+     //postでtasks/にアクセスされた場合の「新規登録処理」
+     public function store(Request $request)
     {
+        // バリデーション
+        $request->validate([
+            'content' => 'required|max:255',
+            'status' => 'required|max:10',
+        ]);
+        
         //メッセージを作成
-        $tasks = new Task;
-        $tasks->content = $request->content;
-        $tasks->save();
+        $task = new Task;
+        $task->content = $request->content;
+        $task->status = $request->status;
+        $task->save();
         
         //トップページへリダイレクトさせる
         return redirect('/');
@@ -57,13 +67,14 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+     //getでtasks/(任意のid)にアクセスされた場合の「取得表示処理」
+     public function show($id)
     {
         //idの値でメッセージを検索して取得
-        $tasks = Task::findOrFail($id);
+        $task = Task::findOrFail($id);
         
         //メッセージ詳細ビューでそれを表示
-        return view('Task.show',['tasks' => $tasks,]);
+        return view('tasks.show',['task' => $task,]);
     }
 
     /**
@@ -72,14 +83,15 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+     //getでtasks/（任意のid）/editにアクセスされば場合の「更新画面表示処理」
+     public function edit($id)
     {
         // idの値でメッセージを検索して取得
-        $tasks = Task::findOrFail($id);
+        $task = Task::findOrFail($id);
 
         // メッセージ編集ビューでそれを表示
-        return view('Task.edit', [
-            'tasks' => $tasks,
+        return view('tasks.edit', [
+            'task' => $task,
         ]);
     }
     /**
@@ -89,13 +101,21 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+      //putまたはpatchでtasks/（任意のid）にアクセスされた場合の「更新処理」
+      public function update(Request $request, $id)
     {
+        // バリデーション
+        $request->validate([
+            'content' => 'required|max:255',
+            'status' => 'required|max:10',
+        ]);
+
         // idの値でメッセージを検索して取得
-        $tasks = Task::findOrFail($id);
+        $task = Task::findOrFail($id);
         // メッセージを更新
-        $tasks->content = $request->content;
-        $tasks->save();
+        $task->content = $request->content;
+        $task->status = $request->status;
+        $task->save();
 
         // トップページへリダイレクトさせる
         return redirect('/');
@@ -109,9 +129,9 @@ class TasksController extends Controller
     public function destroy($id)
     {
         // idの値でメッセージを検索して取得
-        $tasks = Task::findOrFail($id);
+        $task = Task::findOrFail($id);
         // メッセージを削除
-        $tasks->delete();
+        $task->delete();
 
         // トップページへリダイレクトさせる
         return redirect('/');
